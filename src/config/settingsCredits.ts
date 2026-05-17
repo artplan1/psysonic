@@ -206,6 +206,13 @@ const CONTRIBUTOR_ENTRIES = [
     ],
   },
   {
+    github: 'artplan1',
+    since: '1.46.0',
+    contributions: [
+      'Player: cap persisted queue to ±250-track window — fixes QuotaExceededError on large playlists (PR #756)',
+    ],
+  },
+  {
     github: 'Psychotoxical',
     since: '1.0.0',
     contributions: [

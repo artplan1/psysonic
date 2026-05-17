@@ -671,6 +671,13 @@ Foundational work: faster reviews, narrower diffs, and a safety net under the pa
 * Ranged streaming of moov-at-end M4A files no longer races Symphonia's probe against the tail prefetch: a `RangedMp4ProbeGate` holds the probe thread until either the moov tail fetch completes or moov is confirmed in the already-downloaded prefix (fast-start). Previously the probe could start on a partial buffer and immediately return `format probe failed: end of stream`, falling through to the sequential-download fallback even when the track would have played fine.
 * The full-download fallback path now runs ISO-BMFF diagnostic checks on the completed ranged buffer before handing it to Symphonia: zero-hole detection (`mp4_suspect_zero_holes`) and completeness gating (`isobmff_buffer_looks_complete`) trigger an automatic HTTP refetch when the buffer looks sparse or structurally incomplete.
 
+### Player — persisted queue capped to ±250-track window (QuotaExceededError fix)
+
+**By [@artplan1](https://github.com/artplan1), PR [#756](https://github.com/Psychotoxical/psysonic/pull/756)**
+
+* Playing or shuffling a large playlist (10 000+ tracks) serialised the entire queue to `localStorage` on every persisted `set`, triggering a `QuotaExceededError` storm that killed playback and stalled the main thread. Controlled test on a 10 509-track playlist: 9 quota errors before, 0 after.
+* `partialize` now persists only a ±250-track window around the current position (≤ 501 tracks), remapping `queueIndex` into the slice. The authoritative full queue is recovered from the server via `getPlayQueue` on startup — no queue data is lost.
+
 ## [1.45.0] - 2026-05-04
 
 ## Added

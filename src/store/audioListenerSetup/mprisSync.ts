@@ -1,4 +1,5 @@
 import { invoke } from '@tauri-apps/api/core';
+import { IS_MACOS } from '../../utils/platform';
 import { playbackCoverArtForId } from '../../utils/playback/playbackServer';
 import { usePlayerStore } from '../playerStore';
 import { getPlaybackProgressSnapshot, subscribePlaybackProgress } from '../playbackProgress';
@@ -21,9 +22,14 @@ export function setupMprisSync(): () => void {
     if (currentTrack && currentTrack.id !== prevTrackId) {
       prevTrackId = currentTrack.id;
       prevRadioId = null;
-      const coverUrl = currentTrack.coverArt
+      let coverUrl = currentTrack.coverArt
         ? playbackCoverArtForId(currentTrack.coverArt, 512).src
         : undefined;
+      // macOS: souvlaki 0.8.3 NSImage initWithContentsOfURL: returns nil for
+      // ATS-blocked plain-http (most Navidrome) and then dereferences nil
+      // (macos/mod.rs:324) → process abort, uncatchable from JS. Only feed it
+      // https URLs, which NSImage can load. http servers get no macOS artwork.
+      if (IS_MACOS && coverUrl && !coverUrl.startsWith('https:')) coverUrl = undefined;
       invoke('mpris_set_metadata', {
         title: currentTrack.title,
         artist: currentTrack.artist,

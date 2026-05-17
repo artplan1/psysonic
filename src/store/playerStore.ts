@@ -16,6 +16,9 @@ import { createTransportLightActions } from './transportLightActions';
 import { createUiStateActions } from './uiStateActions';
 import { createUndoRedoActions } from './undoRedoActions';
 
+// Half-width of the localStorage queue window (see partialize below).
+const PERSIST_QUEUE_HALF = 250;
+
 export const usePlayerStore = create<PlayerState>()(
   persist(
     (set, get) => {
@@ -81,8 +84,7 @@ export const usePlayerStore = create<PlayerState>()(
       partialize: (state) => {
         // Persist only a window around the current track: the full queue
         // (10k+ on big playlists) overflows the localStorage quota.
-        const PERSIST_QUEUE_HALF = 250;
-        const qi = state.queueIndex ?? 0;
+        const qi = state.queueIndex;
         const start = Math.max(0, qi - PERSIST_QUEUE_HALF);
         const windowedQueue = state.queue.slice(start, qi + PERSIST_QUEUE_HALF + 1);
         return {

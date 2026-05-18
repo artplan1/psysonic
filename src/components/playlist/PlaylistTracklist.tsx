@@ -181,7 +181,7 @@ export default function PlaylistTracklist({
     estimateSize: () => 48,
     overscan: Math.max(8, Math.ceil(viewportH / 48)),
     scrollMargin,
-    getItemKey: i => displayedSongs[i].id + i,
+    getItemKey: i => `${displayedSongs[i].id}:${i}`,
   });
 
   const firstRender = useRef(true);

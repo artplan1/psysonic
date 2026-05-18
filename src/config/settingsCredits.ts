@@ -49,6 +49,7 @@ const CONTRIBUTOR_ENTRIES = [
     since: '1.32.0',
     contributions: [
       'Norwegian (Bokmål) translation (PR #101)',
+      'Ongoing bug & quirk reports via Discord (PRs #747, #750 et al.)',
     ],
   },
   {
@@ -115,6 +116,8 @@ const CONTRIBUTOR_ENTRIES = [
       'Multi-server: pin queue streams, cover art, links, context menu, and Now Playing to queue server (PR #717)',
       'M4A/MP4 streaming: moov-at-end tail prefetch and Symphonia isomp4 probe fix (PR #737)',
       'HTTP stream buffering — seekbar/timer at zero and cover overlay until playback arms (PR #737)',
+      'M4A playback: fix AtomIterator overread in patched isomp4 demuxer — probe gate for ranged tail prefetch, zero-hole fallback detection (PR #757)',
+      'Multi-server: Lucky Mix and Now Playing keep browsed server; queue metadata via apiForServer (PR #768)',
     ],
   },
   {
@@ -202,6 +205,13 @@ const CONTRIBUTOR_ENTRIES = [
     since: '1.46.0',
     contributions: [
       'Search: queue pasted share links from live search (PR #551)',
+    ],
+  },
+  {
+    github: 'artplan1',
+    since: '1.46.0',
+    contributions: [
+      'Player: cap persisted queue to ±250-track window — fixes QuotaExceededError on large playlists (PR #756)',
     ],
   },
   {

@@ -4,6 +4,7 @@ import { APP_MAIN_SCROLL_VIEWPORT_ID } from '../constants/appScroll';
 import { useElementClientHeightById } from '../hooks/useResizeClientHeight';
 import { useCardGridMetrics } from '../hooks/useCardGridMetrics';
 import { useRemeasureGridVirtualizer } from '../hooks/useRemeasureGridVirtualizer';
+import { useVirtualizerScrollMargin } from '../hooks/useVirtualizerScrollMargin';
 import type { CardGridRowHeightVariant } from '../utils/cardGridLayout';
 
 export type VirtualCardGridProps<T> = {
@@ -43,11 +44,21 @@ export function VirtualCardGrid<T>({
   const mainScrollViewportHeight = useElementClientHeightById(APP_MAIN_SCROLL_VIEWPORT_ID);
   const overscan = Math.max(2, Math.ceil(mainScrollViewportHeight / Math.max(1, rowHeightEst)));
 
+  const scrollMargin = useVirtualizerScrollMargin(
+    wrapRef,
+    () => document.getElementById(APP_MAIN_SCROLL_VIEWPORT_ID),
+    {
+      active: !disableVirtualization,
+      deps: [layoutSignal, virtualRowCount],
+    },
+  );
+
   const virtualizer = useVirtualizer({
     count: disableVirtualization ? 0 : virtualRowCount,
     getScrollElement: () => document.getElementById(APP_MAIN_SCROLL_VIEWPORT_ID),
     estimateSize: () => rowHeightEst,
     overscan,
+    scrollMargin,
   });
 
   useRemeasureGridVirtualizer(virtualizer, {
@@ -93,6 +104,9 @@ export function VirtualCardGrid<T>({
         {virtualizer.getVirtualItems().map(vRow => {
           const start = vRow.index * cols;
           const rowItems = items.slice(start, start + cols);
+          // `vRow.start` is measured from the scroll element's top; our wrapper
+          // already sits `scrollMargin` below that, so subtract to land back
+          // in wrapper-local coordinates.
           return (
             <div
               key={vRow.key}
@@ -101,7 +115,7 @@ export function VirtualCardGrid<T>({
                 top: 0,
                 left: 0,
                 width: '100%',
-                transform: `translateY(${vRow.start}px)`,
+                transform: `translateY(${vRow.start - scrollMargin}px)`,
                 display: 'grid',
                 gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
                 gap: gridGap,

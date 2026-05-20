@@ -138,6 +138,8 @@ export default function FavoritesSongsTracklist({
 
   useLayoutEffect(() => {
     const sc = document.getElementById(APP_MAIN_SCROLL_VIEWPORT_ID);
+    // scrollMargin must track height changes in sections above the list (filters, top artists).
+    // Intentionally coupled to the Favorites page shell class — keep in sync with that layout.
     const root = tracklistRef.current?.closest('.content-body') as HTMLElement | null;
     if (!sc) return;
     const measure = () => {
@@ -151,6 +153,7 @@ export default function FavoritesSongsTracklist({
     if (root) ro.observe(root);
     measure();
     return () => ro.disconnect();
+  // selectedIds.size > 0 (boolean): bulk bar show/hide shifts listWrapRef top — remeasure on that edge only.
   }, [tracklistRef, selectedIds.size > 0, pickerOpen, visibleSongs.length]);
 
   const rowVirtualizer = useVirtualizer({
